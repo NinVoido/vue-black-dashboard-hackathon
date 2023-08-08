@@ -7,8 +7,7 @@
           <template slot="header">
             <div class="row">
               <div class="col-sm-6" :class="isRTL ? 'text-right' : 'text-left'">
-                <h5 class="card-category">{{$t('dashboard.totalShipments')}}</h5>
-                <h2 class="card-title">{{$t('dashboard.performance')}}</h2>
+                <h2 class="card-title">Total points</h2>
               </div>
               <div class="col-sm-6">
                 <div class="btn-group btn-group-toggle"
@@ -32,6 +31,7 @@
           <div class="chart-area">
             <line-chart style="height: 100%"
                         ref="bigChart"
+                        v-if="bigLineChart.loaded"
                         chart-id="big-line-chart"
                         :chart-data="bigLineChart.chartData"
                         :gradient-colors="bigLineChart.gradientColors"
@@ -41,85 +41,49 @@
           </div>
         </card>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-4" :class="{'text-right': isRTL}">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{$t('dashboard.totalShipments')}}</h5>
-            <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary "></i> 763,215</h3>
-          </template>
-          <div class="chart-area">
-            <line-chart style="height: 100%"
-                        chart-id="purple-line-chart"
-                        :chart-data="purpleLineChart.chartData"
-                        :gradient-colors="purpleLineChart.gradientColors"
-                        :gradient-stops="purpleLineChart.gradientStops"
-                        :extra-options="purpleLineChart.extraOptions">
-            </line-chart>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-4" :class="{'text-right': isRTL}">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{$t('dashboard.dailySales')}}</h5>
-            <h3 class="card-title"><i class="tim-icons icon-delivery-fast text-info "></i> 3,500€</h3>
-          </template>
-          <div class="chart-area">
-            <bar-chart style="height: 100%"
-                       chart-id="blue-bar-chart"
-                       :chart-data="blueBarChart.chartData"
-                       :gradient-stops="blueBarChart.gradientStops"
-                       :extra-options="blueBarChart.extraOptions">
-            </bar-chart>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-4" :class="{'text-right': isRTL}">
-        <card type="chart">
-          <template slot="header">
-            <h5 class="card-category">{{$t('dashboard.completedTasks')}}</h5>
-            <h3 class="card-title"><i class="tim-icons icon-send text-success "></i> 12,100K</h3>
-          </template>
-          <div class="chart-area">
-            <line-chart style="height: 100%"
-                        chart-id="green-line-chart"
-                        :chart-data="greenLineChart.chartData"
-                        :gradient-stops="greenLineChart.gradientStops"
-                        :extra-options="greenLineChart.extraOptions">
-            </line-chart>
-          </div>
-        </card>
-      </div>
-    </div>
-    <div class="row">
+
       <div class="col-lg-6 col-md-12">
-        <card type="tasks" :header-classes="{'text-right': isRTL}">
+        <card type="tasks">
           <template slot="header">
-            <h6 class="title d-inline">{{$t('dashboard.tasks', {count: 5})}}</h6>
-            <p class="card-category d-inline">{{$t('dashboard.today')}}</p>
-            <base-dropdown menu-on-right=""
-                           tag="div"
-                           title-classes="btn btn-link btn-icon"
-                           aria-label="Settings menu"
-                           :class="{'float-left': isRTL}">
-              <i slot="title" class="tim-icons icon-settings-gear-63"></i>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.action')}}</a>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.anotherAction')}}</a>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.somethingElse')}}</a>
-            </base-dropdown>
+            <h4 class="title d-inline">Top players</h4>
           </template>
           <div class="table-full-width table-responsive">
-            <task-list></task-list>
+            <template>
+              <base-table :data="tableLol.tableData" :columns="tableLol.columns">
+                <template slot="columns">
+                  <th class="text-center">#</th>
+                  <th>Name</th>
+                  <th>Points</th>
+                </template>
+                <template slot-scope="{row}">
+                  <td>{{row.id}}</td>
+                  <td>{{row.name}}</td>
+                  <td>{{row.pts}}</td>
+                </template>
+              </base-table>
+            </template>
           </div>
         </card>
       </div>
       <div class="col-lg-6 col-md-12">
         <card class="card" :header-classes="{'text-right': isRTL}">
-          <h4 slot="header" class="card-title">{{$t('dashboard.simpleTable')}}</h4>
+        <h4 slot="header" class="card-title">Top teams</h4>
           <div class="table-responsive">
-            <user-table></user-table>
+          <template>
+              <base-table :data="tableKek.tableData" :columns="tableKek.columns">
+                <template slot="columns">
+                  <th class="text-center">#</th>
+                  <th>Name</th>
+                  <th>Points</th>
+                </template>
+                <template slot-scope="{row}">
+                  <td>{{row.id}}</td>
+                  <td>{{row.name}}</td>
+                  <td>{{row.pts}}</td>
+                </template>
+              </base-table>
+            </template>
+
           </div>
         </card>
       </div>
@@ -128,102 +92,55 @@
 </template>
 <script>
   import LineChart from '@/components/Charts/LineChart';
-  import BarChart from '@/components/Charts/BarChart';
   import * as chartConfigs from '@/components/Charts/config';
   import TaskList from './Dashboard/TaskList';
   import UserTable from './Dashboard/UserTable';
+  import BaseTable from '@/components/BaseTable';
   import config from '@/config';
 
   export default {
     components: {
       LineChart,
-      BarChart,
       TaskList,
-      UserTable
+      BaseTable,
     },
     data() {
       return {
         bigLineChart: {
           allData: [
-            [100, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100],
-            [80, 120, 105, 110, 95, 105, 90, 100, 80, 95, 70, 120],
-            [60, 80, 65, 130, 80, 105, 90, 130, 70, 115, 60, 130]
+            [],
+            [],
           ],
           activeIndex: 0,
-          chartData: {
-            datasets: [{ }],
-            labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-          },
-          extraOptions: chartConfigs.purpleChartOptions,
-          gradientColors: config.colors.primaryGradient,
-          gradientStops: [1, 0.4, 0],
-          categories: []
-        },
-        purpleLineChart: {
-          extraOptions: chartConfigs.purpleChartOptions,
-          chartData: {
-            labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-            datasets: [{
-              label: "Data",
-              fill: true,
-              borderColor: config.colors.primary,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              pointBackgroundColor: config.colors.primary,
-              pointBorderColor: 'rgba(255,255,255,0)',
-              pointHoverBackgroundColor: config.colors.primary,
-              pointBorderWidth: 20,
-              pointHoverRadius: 4,
-              pointHoverBorderWidth: 15,
-              pointRadius: 4,
-              data: [80, 100, 70, 80, 120, 80],
-            }]
-          },
-          gradientColors: config.colors.primaryGradient,
-          gradientStops: [1, 0.2, 0],
-        },
-        greenLineChart: {
-          extraOptions: chartConfigs.greenChartOptions,
-          chartData: {
-            labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
-            datasets: [{
-              label: "My First dataset",
-              fill: true,
-              borderColor: config.colors.danger,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              pointBackgroundColor: config.colors.danger,
-              pointBorderColor: 'rgba(255,255,255,0)',
-              pointHoverBackgroundColor: config.colors.danger,
-              pointBorderWidth: 20,
-              pointHoverRadius: 4,
-              pointHoverBorderWidth: 15,
-              pointRadius: 4,
-              data: [90, 27, 60, 12, 80],
-            }]
-          },
-          gradientColors: ['rgba(66,134,121,0.15)', 'rgba(66,134,121,0.0)', 'rgba(66,134,121,0)'],
-          gradientStops: [1, 0.4, 0],
-        },
-        blueBarChart: {
-          extraOptions: chartConfigs.barChartOptions,
-          chartData: {
-            labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
-            datasets: [{
-              label: "Countries",
-              fill: true,
-              borderColor: config.colors.info,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              data: [53, 20, 10, 80, 100, 45],
-            }]
+          chartData: null,
+          extraOptions: {
+            spanGaps: true,
+            //responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                type: 'time',
+                parsing: true,
+              },
+            }
           },
           gradientColors: config.colors.primaryGradient,
           gradientStops: [1, 0.4, 0],
-        }
+          categories: [],
+          loaded: false,
+        },
+        tableLol: {
+          columns: ["id", "name", "pts"],
+          tableData: [],
+          loaded: false,
+        },
+        tableKek: {
+          columns: ["id", "name", "pts"],
+          tableData: [],
+          loaded: false,
+        },
+        user_data: null,
+        teams_data: null,
       }
     },
     computed: {
@@ -239,36 +156,131 @@
     },
     methods: {
       initBigChart(index) {
+        console.log(index);
+        console.log(this.bigLineChart.allData);
         let chartData = {
-          datasets: [{
-            fill: true,
-            borderColor: config.colors.primary,
-            borderWidth: 2,
-            borderDash: [],
-            borderDashOffset: 0.0,
-            pointBackgroundColor: config.colors.primary,
-            pointBorderColor: 'rgba(255,255,255,0)',
-            pointHoverBackgroundColor: config.colors.primary,
-            pointBorderWidth: 20,
-            pointHoverRadius: 4,
-            pointHoverBorderWidth: 15,
-            pointRadius: 4,
-            data: this.bigLineChart.allData[index]
-          }],
-          labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+          datasets: this.bigLineChart.allData[index]
         }
-        this.$refs.bigChart.updateGradients(chartData);
+        //this.$refs.bigChart.updateGradients(chartData);
         this.bigLineChart.chartData = chartData;
         this.bigLineChart.activeIndex = index;
       }
     },
-    mounted() {
+    async mounted() {
+      console.log(this.bigLineChart.activeIndex);
+      this.bigLineChart.loaded = false;
+      this.tableLol.loaded = false;
+      let resp = await fetch("http://192.168.14.36:8000/api/v1/scoreboard/users");
+      let data = await resp.json();
+
+      for (let usr = 0; usr < data.length; usr++) {
+        for (let i = 1; i < data[usr].data.length; i++) {
+          data[usr].data[i].y += data[usr].data[i - 1].y;
+        }
+      }
+
+      data = data.filter(c => c.data.length != 0);
+
+      this.user_data = data.sort(function (a, b) {
+        return b.data[b.data.length - 1].y - a.data[a.data.length - 1].y
+      }).map((c) => ({
+        id: 0,
+        name: c.label,
+        pts: c.data[c.data.length - 1].y
+      }));
+
+      console.log(this.user_data[0].pts);
+
+      let data_graph = data.map((c) => (
+        {
+          label: c.label,
+          data: c.data,
+          fill: true,
+          borderColor: config.colors.primary,
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          pointBackgroundColor: config.colors.primary,
+          pointBorderColor: 'rgba(255,255,255,0)',
+          pointHoverBackgroundColor: config.colors.primary,
+          pointBorderWidth: 20,
+          pointHoverRadius: 4,
+          pointHoverBorderWidth: 15,
+          pointRadius: 4,
+        }
+      ));
+
+
+      this.bigLineChart.allData[0] = data_graph;
+
+      resp = await fetch("http://192.168.14.36:8000/api/v1/scoreboard/teams"); //CHANGE
+      data = await resp.json();
+
+      data = JSON.parse('[{"label":"inverse-fencing","data":[{"x":"2023-08-07T20:42:23","y":100.0}]},{"label":"courtly-repository","data":[]},{"label":"extended-focus","data":[]},{"label":"ILoveYou!","data":[{"x":"2023-08-07T20:43:03","y":50.0},{"x":"2023-08-07T21:42:03","y":200.0}]}]');
+
+
+      for (let usr = 0; usr < data.length; usr++) {
+        for (let i = 1; i < data[usr].data.length; i++) {
+          data[usr].data[i].y += data[usr].data[i - 1].y;
+        }
+      }
+
+      data = data.filter(c => c.data.length != 0);
+
+      this.teams_data = data.sort(function (a, b) {
+        return b.data[b.data.length - 1].y - a.data[a.data.length - 1].y
+      }).map((c) => ({
+        id: 0,
+        name: c.label,
+        pts: c.data[c.data.length - 1].y
+      }));
+
+      data_graph = data.filter(c => c.data.length != 0).map((c) => (
+        {
+          label: c.label,
+          data: c.data,
+          fill: true,
+          borderColor: config.colors.primary,
+          borderWidth: 2,
+          borderDash: [],
+          borderDashOffset: 0.0,
+          pointBackgroundColor: config.colors.primary,
+          pointBorderColor: 'rgba(255,255,255,0)',
+          pointHoverBackgroundColor: config.colors.primary,
+          pointBorderWidth: 20,
+          pointHoverRadius: 4,
+          pointHoverBorderWidth: 15,
+          pointRadius: 4,
+        }
+      ));
+
+      console.log(data_graph);
+
+      this.bigLineChart.allData[1] = data_graph;
+
       this.i18n = this.$i18n;
       if (this.enableRTL) {
         this.i18n.locale = 'ar';
         this.$rtl.enableRTL();
       }
-      this.initBigChart(0);
+      this.initBigChart(0, data);
+      this.bigLineChart.loaded = true;
+
+      this.tableLol.tableData = []
+
+      this.tableLol.tableData = this.user_data;
+      for (let i = 0; i < this.user_data.length; i++) {
+        this.tableLol.tableData[i].id = i + 1;
+      }
+
+      this.tableKek.tableData = []
+
+      this.tableKek.tableData = this.teams_data;
+      for (let i = 0; i < this.teams_data.length; i++) {
+        this.tableKek.tableData[i].id = i + 1;
+      }
+
+      this.tableLol.loaded = true;
     },
     beforeDestroy() {
       if (this.$rtl.isRTL) {

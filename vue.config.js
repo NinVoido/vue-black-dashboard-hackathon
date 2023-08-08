@@ -7,7 +7,7 @@ module.exports = {
     resolve: {
       alias: {
         'chart.js': 'chart.js/dist/Chart.js'
-      }
+      },
     },
     plugins: [
       new webpack.optimize.LimitChunkCountPlugin({
@@ -15,6 +15,7 @@ module.exports = {
       })
     ]
   },
+
   pwa: {
     name: 'Vue Black Dashboard',
     themeColor: '#344675',

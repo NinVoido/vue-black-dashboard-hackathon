@@ -3,6 +3,7 @@
     <side-bar>
       <template slot="links">
         <sidebar-link to="/dashboard" :name="$t('sidebar.dashboard')" icon="tim-icons icon-chart-pie-36"/>
+        <sidebar-link to="/scoreboard" :name="$t('sidebar.scoreboard')" icon=""/>
       </template>
     </side-bar>
     <div class="main-panel">
@@ -12,7 +13,6 @@
 
       </dashboard-content>
 
-      <content-footer></content-footer>
     </div>
   </div>
 </template>
@@ -20,15 +20,11 @@
 </style>
 <script>
   import TopNavbar from "./SampleNavbar.vue";
-  import ContentFooter from "./SampleFooter.vue";
   import DashboardContent from "./Content.vue";
-  import MobileMenu from "./MobileMenu";
   export default {
     components: {
       TopNavbar,
-      ContentFooter,
       DashboardContent,
-      MobileMenu
     },
     methods: {
       toggleSidebar() {
